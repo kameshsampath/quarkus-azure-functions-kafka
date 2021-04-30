@@ -4,8 +4,6 @@ import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.annotation.KafkaTrigger;
 import io.smallrye.reactive.messaging.annotations.Broadcast;
 import javax.inject.Inject;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -18,7 +16,7 @@ public class KafkaTriggerFunction extends BaseFunction {
   private static final Logger log = Logger.getLogger("dev.kameshs.azure");
 
   @Inject
-  @Channel("func-in")
+  @Channel("func-source")
   Emitter<String> kafkaDataEmitter;
 
   //TODO handling Data Serialization
@@ -32,16 +30,19 @@ public class KafkaTriggerFunction extends BaseFunction {
     }
 
     if (!bootstrapError) {
-      kafkaDataEmitter.send(kafkaData);
+      //TODO handle exception
+      //TODO improve this with MutinyEmitter
+      kafkaDataEmitter
+          .send(kafkaData);
     } else {
       log.log(Level.ERROR, "Error starting function " + deploymentStatus);
     }
   }
 
-  @Incoming("func-in")
-  @Outgoing("func-out")
+  //TODO make it reactive
+  @Incoming("func-source")
+  @Outgoing("func-sink")
   @Broadcast
-  @Acknowledgment(Strategy.PRE_PROCESSING)
   public String kafkaDataHandler(String kafkaData) {
     //TODO is this suffice ??
     return kafkaData;
