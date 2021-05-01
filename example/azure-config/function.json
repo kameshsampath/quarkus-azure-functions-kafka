@@ -1,0 +1,14 @@
+{
+  "scriptFile": "../${project.build.finalName}.jar",
+  "bindings": [
+    {
+      "type": "kafkaTrigger",
+      "direction": "in",
+      "name": "kafkaTrigger",
+      "topic": "funqy-topic",
+      "brokerList": "my:9092",
+      "consumerGroup": "functions",
+      "dataType": "string"
+    }
+  ]
+}
