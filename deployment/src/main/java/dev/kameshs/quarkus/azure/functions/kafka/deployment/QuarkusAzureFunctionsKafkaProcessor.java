@@ -1,22 +1,13 @@
 package dev.kameshs.quarkus.azure.functions.kafka.deployment;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jboss.logging.Logger;
-
-import com.microsoft.azure.functions.ExecutionContext;
-import com.microsoft.azure.functions.annotation.FunctionName;
 
 import dev.kameshs.azure.functions.kafka.runtime.KafkaTriggerFunction;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
-import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
-import io.quarkus.deployment.builditem.CombinedIndexBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.IndexDependencyBuildItem;
-import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.deployment.pkg.builditem.UberJarRequiredBuildItem;
 
 class QuarkusAzureFunctionsKafkaProcessor {
@@ -41,14 +32,11 @@ class QuarkusAzureFunctionsKafkaProcessor {
     }
 
     @BuildStep
-    UnremovableBeanBuildItem ensureKafkaTriggerFunction(CombinedIndexBuildItem indexBuildItem,
-            BuildProducer<ReflectiveClassBuildItem> reflectiveClasses,
-            BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
-        Set<String> keepMe = new HashSet<>();
-        keepMe.add(FunctionName.class.getName());
-        keepMe.add(ExecutionContext.class.getName());
-        keepMe.add(KafkaTriggerFunction.class.getName());
-
-        return new UnremovableBeanBuildItem(new UnremovableBeanBuildItem.BeanClassNamesExclusion(keepMe));
+    AdditionalBeanBuildItem registerKafkaFunctions() {
+        log.info("Registering Function Beans");
+        return AdditionalBeanBuildItem.builder()
+                .addBeanClass(KafkaTriggerFunction.class)
+                .setUnremovable()
+                .build();
     }
 }

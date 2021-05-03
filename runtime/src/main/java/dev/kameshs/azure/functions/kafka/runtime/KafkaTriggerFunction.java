@@ -1,6 +1,10 @@
 package dev.kameshs.azure.functions.kafka.runtime;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Any;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
@@ -15,6 +19,7 @@ import com.microsoft.azure.functions.annotation.KafkaTrigger;
 
 import io.smallrye.reactive.messaging.annotations.Broadcast;
 
+@ApplicationScoped
 public class KafkaTriggerFunction {
 
     private static final Logger log = Logger.getLogger("dev.kameshs.azure");
