@@ -10,6 +10,8 @@ import org.jboss.logging.Logger;
 import org.jboss.logging.Logger.Level;
 
 import com.microsoft.azure.functions.ExecutionContext;
+import com.microsoft.azure.functions.annotation.FunctionName;
+import com.microsoft.azure.functions.annotation.KafkaTrigger;
 
 import io.smallrye.reactive.messaging.annotations.Broadcast;
 
@@ -21,14 +23,26 @@ public class KafkaTriggerFunction {
     @Channel("func-source")
     Emitter<String> kafkaDataEmitter;
 
-    //TODO handling Data Serialization
-    public void run(String kafkaData, final ExecutionContext executionContext) {
-        log.log(Level.INFO, "Starting ... Quarkus Azure Functions Kafka");
+    @FunctionName("quarkus")
+    public void run(
+            @KafkaTrigger(name = "kafkaTrigger", topic = "foo", brokerList = "localhost:9092", consumerGroup = "bar") String kafkaData,
+            final ExecutionContext executionContext) {
+        log.log(Level.INFO, "Quarkus Azure Functions Kafka received data " + kafkaData);
+        try {
+            //TODO improve this with MutinyEmitter
+            kafkaDataEmitter
+                    .send(kafkaData)
+                    .whenComplete((success, failure) -> {
+                        if (failure != null) {
+                            log.log(Level.ERROR, "Error sending message {0}", failure);
+                        } else {
+                            log.log(Level.INFO, "Message processed successfully");
+                        }
+                    });
+        } catch (Exception e) {
+            log.log(Level.ERROR, "Error with run ", e);
+        }
 
-        //TODO handle exception
-        //TODO improve this with MutinyEmitter
-        kafkaDataEmitter
-                .send(kafkaData);
     }
 
     //TODO make it reactive

@@ -1,14 +1,14 @@
 {
   "scriptFile": "../${project.build.finalName}.jar",
+  "entryPoint": "dev.kameshs.azure.functions.kafka.runtime.KafkaTriggerFunction.run",
   "bindings": [
     {
       "type": "kafkaTrigger",
       "direction": "in",
       "name": "kafkaTrigger",
-      "topic": "funqy-topic",
-      "brokerList": "my:9092",
+      "topic": "my-topic",
       "consumerGroup": "functions",
-      "dataType": "string"
+      "brokerList": "localhost:9092"
     }
   ]
 }
