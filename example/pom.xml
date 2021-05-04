@@ -39,7 +39,7 @@
         <quarkus-azure-functions-kafka.version>1.0.0-SNAPSHOT</quarkus-azure-functions-kafka.version>
         <!-- Kafka Configuration, command separated list of Kafka Bootstrap servers -->
         <kafka.bootstrap.servers>my-cluster-kafka-bootstrap.kafka:9092</kafka.bootstrap.servers>
-        <jkube.image.name>quay.io/kameshsampath</jkube.image.name>
+        <jkube.image.name>quay.io/kameshsampath/</jkube.image.name>
         <kubernetes-maven-plugin.version>1.2.0</kubernetes-maven-plugin.version>
         <docker.buildArg.settingsXml>settings.xml</docker.buildArg.settingsXml>
     </properties>
@@ -208,16 +208,59 @@
                 <configuration>
                     <images>
                         <image>
-                            <name>${jkube.image.name}/%a:%l</name>
+                            <name>${jkube.image.name}%a:%l</name>
                             <build>
+                                <from>quay.io/kameshsampath/java-azure-functions-base</from>
                                 <tags>
                                     <tag>${project.version}</tag>
                                 </tags>
-                                <dockerFile>${project.basedir}/Dockerfile</dockerFile>
+                                <env>
+                                    <LD_LIBRARY_PATH>
+                                        /deployments/azure-functions/${functionAppName}/bin/runtimes/linux-x64/native
+                                    </LD_LIBRARY_PATH>
+                                    <JAVA_HOME>/usr</JAVA_HOME>
+                                    <TERM>xterm-mono</TERM>
+                                </env>
+                                <ports>
+                                    <port>80</port>
+                                </ports>
+                                <assembly>
+                                    <mode>dir</mode>
+                                    <targetDir>/deployments</targetDir>
+                                    <inline>
+                                        <id>quarkus-azure-functions</id>
+                                        <fileSets>
+                                            <fileSet>
+                                                <directory>${project.basedir}/target/azure-functions
+                                                </directory>
+                                                <outputDirectory>azure-functions</outputDirectory>
+                                            </fileSet>
+                                        </fileSets>
+                                    </inline>
+                                </assembly>
+                                <workdir>/deployments/azure-functions/${functionAppName}</workdir>
+                                <cmd>
+                                    <exec>
+                                        <arg>/deployments/azure-functions-cli/func</arg>
+                                        <arg>host</arg>
+                                        <arg>start</arg>
+                                        <arg>--java</arg>
+                                    </exec>
+                                </cmd>
                             </build>
                         </image>
                     </images>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>build-func-image</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

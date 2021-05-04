@@ -1,0 +1,54 @@
+---
+data:
+  AzureWebJobsStorage: ''
+  FUNCTIONS_WORKER_RUNTIME: amF2YQ==
+apiVersion: v1
+kind: Secret
+metadata:
+  name: azure-func-kafka-example
+  namespace: my-demos
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azure-func-kafka-example
+  namespace: my-demos
+  labels:
+    app: azure-func-kafka-example
+spec:
+  selector:
+    matchLabels:
+      app: azure-func-kafka-example
+  template:
+    metadata:
+      labels:
+        app: azure-func-kafka-example
+    spec:
+      containers:
+        - name: azure-func-kafka-example
+          image: quay.io/kameshsampath/quarkus-azure-functions-example
+          env:
+            - name: AzureFunctionsJobHost__functions__0
+              value: quarkus
+          envFrom:
+            - secretRef:
+                name: azure-func-kafka-example
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: azure-func-kafka-example
+  namespace: my-demos
+  labels: { }
+spec:
+  scaleTargetRef:
+    name: azure-func-kafka-example
+  triggers:
+    - type: kafka
+      metadata:
+        direction: in
+        topic: my-topic
+        consumerGroup: functions
+        bootstrapServers: my-cluster-kafka-bootstrap.kafka:9092
+---
+

@@ -1,10 +1,5 @@
 version: "3.9"
 services:
-  azurekafkafunc:
-    build:
-      context: .
-      args:
-        settingsXml: ./settings-docker-local.xml
   zookeeper:
     image: quay.io/strimzi/kafka:0.22.1-kafka-2.7.0
     command: [

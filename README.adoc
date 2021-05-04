@@ -1,5 +1,6 @@
 = Quarkus Azure Kafka Functions Extension
 
+A Quarkus extension that will allow you to build and deploy Azure Functions with Kafka extension
 
 [IMPORTANT]
 ====
@@ -18,12 +19,29 @@ As this is not an official extension you need build and install locally before y
 [source,bash]
 ----
 cd example
-./mvnw clean install
+./mvnw clean package \
+  -Djkube.image.name=<your-image-repo>#<.>
+  -Dkafka.bootstrap.servers=<your-kafka-bootstrap-severs>#<.>
 ----
+<.> Builds the container image, default image repo is `quay.io/kameshsampath`
+<.> The Kafkabootstrap servers to use
 
-== Build example container image
+== Deploy
 
 [source,bash]
 ----
-./build-push.sh
+func kubernetes deploy \
+    --name azure-func-kafka-example \
+    --namespace my-demos \
+    --image-name quay.io/kameshsampath/quarkus-azure-functions-example
+----
+
+== Undeploy
+
+[source,bash]
+----
+func kubernetes delete \
+    --name azure-func-kafka-example \
+    --namespace my-demos \
+    --image-name quay.io/kameshsampath/quarkus-azure-functions-example
 ----
