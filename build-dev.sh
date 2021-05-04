@@ -4,7 +4,7 @@ set -eu
 
 set -o pipefail
 
-IMAGE_NAME=${IMAGE_NAME:-example/azure-func-kafka-example}
+IMAGE_NAME=${IMAGE_NAME:-quay.io/kameshsampath/azure-func-kafka-example}
 MAVEN_SETTINGS_XML=${MAVEN_SETTINGS_XML:-settings-docker-local.xml}
 
 docker build \

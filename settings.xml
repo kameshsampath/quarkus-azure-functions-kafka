@@ -4,8 +4,8 @@
     <mirror>
       <id>central</id>
       <name>central</name>
-      <!-- Point it to your nexus if you have one -->
-      <url>https://repo1.maven.org/maven2/</url>
+      <!-- In cluster nexus repo to make builds faster -->
+      <url>https://nexus.infra:8081/repository/maven-public/</url>
       <mirrorOf>*</mirrorOf>
     </mirror>
   </mirrors>

@@ -1,18 +1,16 @@
 package dev.kameshs.example;
 
-import com.microsoft.azure.functions.annotation.FunctionName;
-import com.microsoft.azure.functions.annotation.KafkaTrigger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.jboss.logging.Logger;
-import org.jboss.logging.Logger.Level;
 
 public class GreeterFunqy {
 
-  private Logger log = Logger.getLogger("dev.kameshs.example.greeter");
+    private Logger log = Logger.getLogger("dev.kameshs.example.greeter");
 
-  @Incoming("func-sink")
-  public void greeter(String data) {
-    log.log(Level.INFO, data);
-  }
+    @Incoming("func-sink")
+    public void greeter(String data) {
+        log.log(Level.INFO, "Processing Data:{0}", data);
+    }
 }

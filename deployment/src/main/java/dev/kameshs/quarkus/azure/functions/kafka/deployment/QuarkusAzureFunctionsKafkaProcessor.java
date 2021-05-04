@@ -1,8 +1,11 @@
 package dev.kameshs.quarkus.azure.functions.kafka.deployment;
 
-import org.jboss.logging.Logger;
+import java.util.logging.Logger;
+
+import com.microsoft.azure.functions.ExecutionContext;
 
 import dev.kameshs.azure.functions.kafka.runtime.KafkaTriggerFunction;
+import dev.kameshs.azure.functions.kafka.runtime.KafkaTriggerHandler;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -13,7 +16,7 @@ import io.quarkus.deployment.pkg.builditem.UberJarRequiredBuildItem;
 class QuarkusAzureFunctionsKafkaProcessor {
 
     private static final String FEATURE = "quarkus-azure-functions-kafka";
-    private static final Logger log = Logger.getLogger(QuarkusAzureFunctionsKafkaProcessor.class);
+    private static final Logger log = Logger.getLogger(QuarkusAzureFunctionsKafkaProcessor.class.getName());
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -32,11 +35,20 @@ class QuarkusAzureFunctionsKafkaProcessor {
     }
 
     @BuildStep
-    AdditionalBeanBuildItem registerKafkaFunctions() {
+    void registerKafkaTriggerFunction(BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
         log.info("Registering Function Beans");
-        return AdditionalBeanBuildItem.builder()
-                .addBeanClass(KafkaTriggerFunction.class)
+        AdditionalBeanBuildItem.Builder builder = AdditionalBeanBuildItem.builder();
+        builder.addBeanClass(KafkaTriggerFunction.class)
                 .setUnremovable()
                 .build();
+        builder.addBeanClass(KafkaTriggerHandler.class)
+                .setUnremovable()
+                .build();
+        builder.addBeanClass(ExecutionContext.class)
+                .setUnremovable()
+                .build();
+
+        additionalBeans.produce(builder.build());
     }
+
 }

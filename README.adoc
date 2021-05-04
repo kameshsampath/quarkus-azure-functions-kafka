@@ -1,0 +1,29 @@
+= Quarkus Azure Kafka Functions Extension
+
+
+[IMPORTANT]
+====
+As this is not an official extension you need build and install locally before you can use it in your example.
+====
+
+== Build extension locally
+
+[source,bash]
+----
+./mvnw clean install
+----
+
+== Build example locally
+
+[source,bash]
+----
+cd example
+./mvnw clean install
+----
+
+== Build example container image
+
+[source,bash]
+----
+./build-push.sh
+----

@@ -37,6 +37,11 @@
         </stagingDirectory>
         <!-- Quarkus Extensions -->
         <quarkus-azure-functions-kafka.version>1.0.0-SNAPSHOT</quarkus-azure-functions-kafka.version>
+        <!-- Kafka Configuration, command separated list of Kafka Bootstrap servers -->
+        <kafka.bootstrap.servers>my-cluster-kafka-bootstrap.kafka:9092</kafka.bootstrap.servers>
+        <jkube.image.name>quay.io/kameshsampath</jkube.image.name>
+        <kubernetes-maven-plugin.version>1.2.0</kubernetes-maven-plugin.version>
+        <docker.buildArg.settingsXml>settings.xml</docker.buildArg.settingsXml>
     </properties>
 
     <dependencyManagement>
@@ -159,27 +164,6 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <overwrite>true</overwrite>
-                            <outputDirectory>${stagingDirectory}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/azure-config</directory>
-                                    <includes>
-                                        <include>host.json</include>
-                                        <include>local.settings.json</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-
-                    <execution>
                         <id>copy-resources-function</id>
                         <phase>package</phase>
                         <goals>
@@ -214,6 +198,25 @@
                             <directory>bin</directory>
                         </fileset>
                     </filesets>
+                </configuration>
+            </plugin>
+            <!--  Make sure its at last for all other package stuff to be done -->
+            <plugin>
+                <groupId>org.eclipse.jkube</groupId>
+                <artifactId>kubernetes-maven-plugin</artifactId>
+                <version>${kubernetes-maven-plugin.version}</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <name>${jkube.image.name}/%a:%l</name>
+                            <build>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <dockerFile>${project.basedir}/Dockerfile</dockerFile>
+                            </build>
+                        </image>
+                    </images>
                 </configuration>
             </plugin>
         </plugins>
